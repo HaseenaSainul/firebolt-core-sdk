@@ -23,7 +23,11 @@
     "publish:word": "mkdir -p dist/word/schemas && cd dist/docs && find . -iname \"*.md\" -type f -exec sh -c 'pandoc \"${0}\" -o \"../word/${0%.md}.docx\"' {} \\;",
     "everything": "npm run fs:setup && npm run validate:each && npm run build:openrpc && npm run validate:assembled && npm run build:sdk && npm run dist:sdk && npm run dist:declarations && npm run test && npm run build:docs && npm run dist:docs",
     "prepare": "husky install",
-    "prepack": "npm run fs:setup && npm run build:openrpc && npm run build:sdk && npm run dist:sdk && npm run dist:declarations"
+    "prepack": "npm run fs:setup && npm run build:openrpc && npm run build:sdk && npm run dist:sdk && npm run dist:declarations",
+    "native:configure": "cmake-js reconfigure --directory src/native/sdk --CDSYSROOT_PATH=${SYSROOT_PATH} --CDCMAKE_INSTALL_PREFIX=${SYSROOT_PATH}/usr --CDENABLE_TESTS=${ENABLE_TESTS}",
+    "native:compile": "cmake-js build --directory src/native/sdk",
+    "native:setup": "npm run native:configure && npm run native:compile",
+    "native:install": "NODE_INSTALL_PATH=${SYSROOT_PATH} TARGET_NAME=FireboltSDK node src/native/sdk/Scripts/install.js"
   },
   "repository": {
     "type": "git",
@@ -34,10 +38,13 @@
     "url": "https://github.com/rdkcentral/firebolt-core-sdk/issues"
   },
   "homepage": "https://github.com/rdkcentral/firebolt-core-sdk#readme",
+  "dependencies": {
+    "@firebolt-js/openrpc": "file:../firebolt-openrpc",
+    "cmake-js": "^7.0.0"
+  },
   "devDependencies": {
     "@commitlint/cli": "^17.0.3",
     "@commitlint/config-conventional": "^17.0.3",
-    "@firebolt-js/openrpc": "^1.7.1",
     "@firebolt-js/schemas": "^0.5.0",
     "@semantic-release/changelog": "^6.0.1",
     "@semantic-release/git": "^10.0.1",
