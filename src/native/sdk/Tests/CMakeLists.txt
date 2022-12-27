@@ -18,6 +18,7 @@ target_link_libraries(${TARGET}
     PUBLIC
         ${NAMESPACE}Core::${NAMESPACE}Core
         ${FIREBOLT_NAMESPACE}SDK::${FIREBOLT_NAMESPACE}SDK
+        ${FIREBOLT_NAMESPACE}SDKTests::${FIREBOLT_NAMESPACE}SDKTests
 )
 
 target_include_directories(${TARGET}
