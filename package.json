@@ -10,16 +10,17 @@
     "prepare:setup": "npm run clean && npx mkdirp ./dist/docs ./dist/lib ./build/docs/markdown ./build/docs/wiki ./build/sdk/javascript/src",
     "validate": "firebolt-openrpc --task validate --source ./src --shared-schemas node_modules/@firebolt-js/schemas/src/schemas/ && npm run build:openrpc && firebolt-openrpc --task validate --source ./dist/firebolt-open-rpc.json --shared-schemas node_modules/@firebolt-js/schemas/src/schemas/",
     "build:openrpc": "firebolt-openrpc --task openrpc --source ./src --template ./src/template/openrpc/template.json --output ./dist/firebolt-open-rpc.json --shared-schemas node_modules/@firebolt-js/schemas/src/schemas/",
-    "build:sdk": "firebolt-openrpc --task sdk --source ./src/ --template ./src/template/js --output ./build/sdk/javascript/src --static-modules Platform --shared-schemas node_modules/@firebolt-js/schemas/src/schemas/",
+    "build:jssdk": "firebolt-openrpc --task sdk --lang javascript --source ./src/ --template ./src/template/js --output ./build/sdk/javascript/src --static-modules Platform --shared-schemas node_modules/@firebolt-js/schemas/src/schemas/",
+    "build:csdk": "firebolt-openrpc --task sdk --lang native-c --source ./src/ --output ./build/sdk/native-c/ --shared-schemas node_modules/@firebolt-js/schemas/src/schemas/",
     "build:docs": "firebolt-openrpc --task docs --source ./src/ --template ./src/template/markdown --output ./build/docs/markdown --shared-schemas node_modules/@firebolt-js/schemas/src/schemas/ --as-path",
     "build:wiki": "firebolt-openrpc --task docs --source ./src/ --template ./src/template/markdown --output ./build/docs/wiki --shared-schemas node_modules/@firebolt-js/schemas/src/schemas/",
-    "dist:sdk": "npm run validate && npm run build:sdk && cp -R ./build/sdk/javascript/src/* ./dist/lib/ && npm run test",
+    "dist:sdk": "npm run validate && npm run build:jssdk && cp -R ./build/sdk/javascript/src/* ./dist/lib/ && npm run test",
     "dist:d": "npm run validate && firebolt-openrpc --task declarations --source ./src/ --template ./src/template/declarations/template.d.ts --output ./dist/lib/firebolt.d.ts --shared-schemas node_modules/@firebolt-js/schemas/src/schemas/",
     "dist:docs": "npm run validate && npm run build:docs asPath && rimraf ./dist/docs && cp -R ./build/docs/markdown ./dist/docs",
     "test:setup": "rimraf test/transpiled-suite && npx tsc --target es6 --moduleResolution node --outDir test/transpiled-suite/",
     "test": "npm run test:setup && node --experimental-vm-modules node_modules/jest/bin/jest.js --config=jest.config.json --detectOpenHandles",
     "clean": "rimraf build && rimraf dist",
-    "build": "npm run validate && npm run build:docs && npm run build:sdk",
+    "build": "npm run validate && npm run build:docs && npm run build:jssdk && npm run build:csdk",
     "publish:docs": "npm run build:docs && sh ./push-docs.sh",
     "publish:word": "npx mkdirp ./dist/word/schemas && cd ./dist/docs && find . -iname \"*.md\" -type f -exec sh -c 'pandoc \"${0}\" -o \"../word/${0%.md}.docx\"' {} \\;"
   },
@@ -32,9 +33,11 @@
     "url": "https://github.com/rdkcentral/firebolt-core-sdk/issues"
   },
   "homepage": "https://github.com/rdkcentral/firebolt-core-sdk#readme",
-  "dependencies": {},
+  "dependencies": {
+    "@firebolt-js/openrpc": "file:../firebolt-openrpc",
+    "@firebolt-js/sdk": "^0.8.1"
+  },
   "devDependencies": {
-    "@firebolt-js/openrpc": "1.6.1",
     "@firebolt-js/schemas": "0.3.0",
     "ajv": "^6.12.6",
     "jest": "^28.1.0",
