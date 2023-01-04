@@ -16,20 +16,29 @@
 
 cmake_minimum_required(VERSION 3.3)
 
-project(FireboltCore)
-option(ENABLE_TESTS "Build core sdk native test" OFF)
+project(FireboltCoreSDK)
+project_version(1.0.0)
+set(TARGET ${PROJECT_NAME})
+message("Setup ${TARGET} v${PROJECT_VERSION}")
 
-list(APPEND CMAKE_MODULE_PATH
-	"${SYSROOT_PATH}/usr/lib/cmake"
-	"${SYSROOT_PATH}/tools/cmake")
-message("SYSROOT_PATH = " ${SYSROOT_PATH})
-find_package(WPEFramework CONFIG REQUIRED)
-find_package(Firebolt CONFIG REQUIRED)
-include(HelperFunctions)
+add_library(${TARGET} SHARED
+    Module.cpp
+    )
 
-add_subdirectory(src)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+find_package(${NAMESPACE}Core CONFIG REQUIRED)
 
-if (ENABLE_TESTS)
-   add_subdirectory(test)
-endif()
+target_link_libraries(${TARGET}
+    PUBLIC
+        ${NAMESPACE}Core::${NAMESPACE}Core
+)
+
+InstallHeaders(
+    TARGET ${TARGET}
+    EXCLUDE_ROOT_DIR
+    HEADERS .
+    NAMESPACE ${FIREBOLT_NAMESPACE}
+    SOURCE ${GENERATED_CODE_PATH}/include
+    DESTINATION ${FIREBOLT_NAMESPACE}/generated
+)
 

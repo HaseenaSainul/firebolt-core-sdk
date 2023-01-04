@@ -66,3 +66,17 @@ target_include_directories(${TESTAPP}
         $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/../>
 )
+
+install(
+    TARGETS ${TESTLIB} EXPORT ${TESTLIB}Targets
+    LIBRARY DESTINATION lib COMPONENT libs
+     PUBLIC_HEADER DESTINATION include/${FIREBOLT_NAMESPACE}Test COMPONENT devel   # headers for mac (note the different component -> different package)
+        INCLUDES DESTINATION include/${FIREBOLT_NAMESPACE}Test # headers
+)
+
+InstallCMakeConfig(TARGETS ${TESTLIB})
+InstallCMakeConfigs(TARGET ${TESTLIB} DESTINATION ${FIREBOLT_NAMESPACE})
+InstallHeaders(TARGET ${TESTLIB} HEADERS . NAMESPACE ${FIREBOLT_NAMESPACE} DESTINATION FireboltTest)
+InstallLibraries(TARGET ${TESTLIB} LIBRARIES ${TESTLIB} DESTINATION ${FIREBOLT_NAMESPACE})
+
+
