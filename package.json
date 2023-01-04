@@ -24,10 +24,10 @@
     "everything": "npm run fs:setup && npm run validate:each && npm run build:openrpc && npm run validate:assembled && npm run build:sdk && npm run dist:sdk && npm run dist:declarations && npm run test && npm run build:docs && npm run dist:docs",
     "prepare": "husky install",
     "prepack": "npm run fs:setup && npm run build:openrpc && npm run build:sdk && npm run dist:sdk && npm run dist:declarations",
-    "native:configure": "cmake-js reconfigure --directory src/native/sdk --CDSYSROOT_PATH=${SYSROOT_PATH} --CDCMAKE_INSTALL_PREFIX=${SYSROOT_PATH}/usr --CDENABLE_TESTS=${ENABLE_TESTS}",
-    "native:compile": "cmake-js build --directory src/native/sdk",
-    "native:setup": "npm run native:configure && npm run native:compile",
-    "native:install": "NODE_INSTALL_PATH=${SYSROOT_PATH} TARGET_NAME=FireboltSDK node src/native/sdk/Scripts/install.js"
+    "nativesdk:configure": "cmake-js reconfigure --directory src/native --CDSYSROOT_PATH=${SYSROOT_PATH} --CDCMAKE_INSTALL_PREFIX=${SYSROOT_PATH}/usr --CDENABLE_TESTS=${ENABLE_TESTS}",
+    "nativesdk:compile": "cmake-js build --directory src/native",
+    "nativesdk:setup": "npm run nativesdk:configure && npm run nativesdk:compile",
+    "nativesdk:install": "NODE_INSTALL_PATH=${SYSROOT_PATH} TARGET_NAME=FireboltSDK node src/native/scripts/install.js"
   },
   "repository": {
     "type": "git",
