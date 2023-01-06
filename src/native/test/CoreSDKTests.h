@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include <FireboltSDKTests.h>
+#include <OpenRPCTests.h>
 
 namespace FireboltSDK {
     class Policy : public WPEFramework::Core::JSON::Container {

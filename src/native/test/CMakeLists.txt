@@ -28,7 +28,7 @@ find_package(${NAMESPACE}Core CONFIG REQUIRED)
 find_package(${FIREBOLT_NAMESPACE}SDK CONFIG REQUIRED)
 find_package(${FIREBOLT_NAMESPACE}SDKTests CONFIG REQUIRED)
 
-add_library(${TESTLIB} STATIC FireboltCoreSDKTests.cpp)
+add_library(${TESTLIB} STATIC CoreSDKTests.cpp CoreSDKTestGeneratedCode)
 
 target_link_libraries(${TESTLIB}
     PUBLIC
@@ -40,7 +40,10 @@ target_link_libraries(${TESTLIB}
 target_include_directories(${TESTLIB}
     PRIVATE
     $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/Source>
-    $<INSTALL_INTERFACE:include/${FIREBOLT_NAMESPACE}
+    $<BUILD_INTERFACE:${GENERATED_CODE_PATH}/include>
+    $<BUILD_INTERFACE:${SYSROOT_PATH}/usr/include>
+    $<BUILD_INTERFACE:${SYSROOT_PATH}/usr/include/${FIREBOLT_NAMESPACE}>
+    $<INSTALL_INTERFACE:include/${FIREBOLT_NAMESPACE}Test>
 )
 
 set_target_properties(${TESTLIB} PROPERTIES
@@ -54,7 +57,7 @@ set(TESTAPP FireboltCoreSDKTestApp)
 
 message("Setup ${TESTAPP} v${PROJECT_VERSION}")
 
-add_executable(${TESTAPP} FireboltCoreSDKTestsMain.c Module.cpp)
+add_executable(${TESTAPP} Main.c Module.cpp)
 
 target_link_libraries(${TESTAPP}
     PRIVATE

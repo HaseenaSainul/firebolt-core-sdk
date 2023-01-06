@@ -16,17 +16,19 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#pragma once
+#ifndef _CORESDK_TEST_GENERATED_CODE_H
+#define _CORESDK_TEST_GENERATED_CODE_H
 
-#include <fireboltsdktest.h>
+#include <Error.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-uint32_t test_firebolt_core_main();
-uint32_t test_properties_get_policy();
+uint32_t test_generated_properties_get_device_version();
 
 #ifdef __cplusplus
 }
 #endif
+
+#endif //_CORESDK_TEST_GENERATED_CODE_H

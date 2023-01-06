@@ -17,7 +17,7 @@
  */
 
 #include "Module.h"
-#include "FireboltCoreSDKTests.h"
+#include "CoreSDKTests.h"
 
 namespace FireboltSDK {
     CoreTests::CoreTests()
@@ -33,13 +33,17 @@ namespace FireboltSDK {
         WPEFramework::Core::ProxyType<Policy> response;
         uint32_t status = FireboltSDK::Properties::Get(method, response);
 
-        EXPECT_EQ(status, Error::None);
-        if (status == Error::None) {
-            printf("\nEnableRecommendations : %d", response->EnableRecommendations.Value());
-            printf("\nShareWatchHistory : %d", response->ShareWatchHistory.Value());
-            printf("\nRememberWatchedPrograms : %d", response->RememberWatchedPrograms.Value());
+        EXPECT_EQ(status, FireboltSDKErrorNone);
+        if (status == FireboltSDKErrorNone) {
+            FIREBOLT_LOG_INFO(FireboltSDK::Logger::Category::Core, Logger::Module<CoreTests>(),
+            "EnableRecommendations : %d", response->EnableRecommendations.Value());
+            FIREBOLT_LOG_INFO(FireboltSDK::Logger::Category::Core, Logger::Module<CoreTests>(),
+            "ShareWatchHistory : %d", response->ShareWatchHistory.Value());
+            FIREBOLT_LOG_INFO(FireboltSDK::Logger::Category::Core, Logger::Module<CoreTests>(),
+            "RememberWatchedPrograms : %d", response->RememberWatchedPrograms.Value());
         } else {
-            printf("\nGet %s status = %d\n", method.c_str(), status);
+            FIREBOLT_LOG_ERROR(FireboltSDK::Logger::Category::Core, Logger::Module<CoreTests>(),
+            "Get %s status = %d", method.c_str(), status);
         }
 
         return status;
@@ -61,13 +65,17 @@ uint32_t test_properties_get_policy()
     WPEFramework::Core::ProxyType<FireboltSDK::Policy> response;
     uint32_t status = FireboltSDK::Properties::Get(method, response);
 
-    EXPECT_EQ(status, FireboltSDK::Error::None);
-    if (status == FireboltSDK::Error::None) {
-        printf("\nEnableRecommendations : %d", response->EnableRecommendations.Value());
-        printf("\nShareWatchHistory : %d", response->ShareWatchHistory.Value());
-        printf("\nRememberWatchedPrograms : %d", response->RememberWatchedPrograms.Value());
+    EXPECT_EQ(status, FireboltSDKErrorNone);
+    if (status == FireboltSDKErrorNone) {
+        FIREBOLT_LOG_INFO(FireboltSDK::Logger::Category::Core, "ctest",
+        "EnableRecommendations : %d", response->EnableRecommendations.Value());
+        FIREBOLT_LOG_INFO(FireboltSDK::Logger::Category::Core, "ctest",
+        "ShareWatchHistory : %d", response->ShareWatchHistory.Value());
+        FIREBOLT_LOG_INFO(FireboltSDK::Logger::Category::Core, "ctest",
+        "RememberWatchedPrograms : %d", response->RememberWatchedPrograms.Value());
     } else {
-        printf("\nGet %s status = %d\n", method.c_str(), status);
+        FIREBOLT_LOG_ERROR(FireboltSDK::Logger::Category::Core, "ctest",
+        "Get %s status = %d", method.c_str(), status);
     }
 
     return status;
