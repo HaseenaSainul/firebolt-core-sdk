@@ -19,10 +19,19 @@ cmake_minimum_required(VERSION 3.3)
 project(FireboltCore)
 option(ENABLE_TESTS "Build core sdk native test" OFF)
 
+if (NOT SYSROOT_PATH)
+    # Set sysroot to support PC builds, sysroot_path not configured case
+    set(SYSROOT_PATH "${CMAKE_SOURCE_DIR}/../../node_modules/@firebolt-js/openrpc/firebolt" CACHE INTERNAL "" FORCE)
+endif()
+if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+    set(CMAKE_INSTALL_PREFIX "${SYSROOT_PATH}/usr" CACHE INTERNAL "" FORCE)
+    set(CMAKE_PREFIX_PATH ${SYSROOT_PATH}/usr/lib/cmake CACHE INTERNAL "" FORCE)
+endif()
+
 list(APPEND CMAKE_MODULE_PATH
 	"${SYSROOT_PATH}/usr/lib/cmake"
 	"${SYSROOT_PATH}/tools/cmake")
-message("SYSROOT_PATH = " ${SYSROOT_PATH})
+
 find_package(WPEFramework CONFIG REQUIRED)
 find_package(Firebolt CONFIG REQUIRED)
 include(HelperFunctions)

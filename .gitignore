@@ -3,3 +3,7 @@ dist/*
 node_modules/*
 .DS_Store
 test/transpiled-suite/*
+src/native/build/*
+build.sh
+run.sh
+firebolt

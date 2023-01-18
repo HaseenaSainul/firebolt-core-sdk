@@ -19,7 +19,7 @@
 #include "CoreSDKCTests.h"
 #include "CoreSDKTestGeneratedCode.h"
 #include <Common/Types.h>
-//#include <Device.h>
+#include <Device.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -28,9 +28,9 @@ extern "C" {
 uint32_t test_generated_properties_get_device_version()
 {
     uint32_t result = FireboltSDKErrorGeneral;
-#if 0
     Device_VersionsHandle handle;
     handle = Device_VersionsHandle_Create();
+#if 1
     if (Device_VersionsHandle_IsValid(handle)) {
         Device_VersionsHandle_Addref(handle);
         Types_SemanticVersionHandle sdkHandle = Device_Versions_Get_Sdk(handle);
