@@ -17,6 +17,7 @@
  */
 
 #include "CoreSDKCTests.h"
+#include "CoreSDKTestGeneratedCode.h"
 
 int __cnt = 0;
 int __pass = 0;
@@ -37,6 +38,8 @@ int main()
     EXECUTE("test_eventregister_by_providing_callback", test_eventregister_by_providing_callback);
     EXECUTE("test_eventregister", test_eventregister);
     EXECUTE("test_string_set_get_value", test_string_set_get_value);
+    EXECUTE("test_generated_properties_get_device_id", test_generated_properties_get_device_id);
+    EXECUTE("test_generated_properties_get_device_version", test_generated_properties_get_device_version);
     test_firebolt_dispose_instance();
 
     printf("TOTAL: %i tests; %i PASSED, %i FAILED\n", TotalTests, TotalTestsPassed, (TotalTests - TotalTestsPassed));

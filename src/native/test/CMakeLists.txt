@@ -35,6 +35,7 @@ target_link_libraries(${TESTLIB}
         ${NAMESPACE}Core::${NAMESPACE}Core
         ${FIREBOLT_NAMESPACE}SDK::${FIREBOLT_NAMESPACE}SDK
         ${FIREBOLT_NAMESPACE}SDKTests::${FIREBOLT_NAMESPACE}SDKTests
+        ${FIREBOLT_NAMESPACE}CoreSDK
 )
 
 target_include_directories(${TESTLIB}

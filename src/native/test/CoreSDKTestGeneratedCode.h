@@ -19,13 +19,13 @@
 #ifndef _CORESDK_TEST_GENERATED_CODE_H
 #define _CORESDK_TEST_GENERATED_CODE_H
 
-#include <Error.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 uint32_t test_generated_properties_get_device_version();
+uint32_t test_generated_properties_get_device_id();
 
 #ifdef __cplusplus
 }
