@@ -26,6 +26,9 @@ extern "C" {
 
 uint32_t test_generated_properties_get_device_version();
 uint32_t test_generated_properties_get_device_id();
+uint32_t test_generated_properties_get_accessibility_closedcaption();
+uint32_t test_generated_properties_get_accessibility_voiceguidancesettings();
+uint32_t test_generated_properties_get_advertising_policy();
 
 #ifdef __cplusplus
 }
