@@ -29,6 +29,7 @@ uint32_t test_generated_properties_get_device_id();
 uint32_t test_generated_properties_get_accessibility_closedcaption();
 uint32_t test_generated_properties_get_accessibility_voiceguidancesettings();
 uint32_t test_generated_properties_get_advertising_policy();
+uint32_t test_generated_event_device_name();
 
 #ifdef __cplusplus
 }

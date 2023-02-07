@@ -132,7 +132,7 @@ uint32_t test_generated_properties_get_accessibility_voiceguidancesettings()
         if (Accessibility_VoiceGuidanceSettingsHandle_IsValid(handle) == true) {
             bool enabled = Accessibility_VoiceGuidanceSettings_Get_Enabled(handle);
             uint32_t speed = Accessibility_VoiceGuidanceSettings_Get_Speed(handle);
-            printf("VoiceGuidanceSettings: Enabled : %d, Speed : %d", enabled, speed);
+            printf("VoiceGuidanceSettings: Enabled : %d, Speed : %d\n", enabled, speed);
             Accessibility_VoiceGuidanceSettingsHandle_Release(handle);
         } else {
             result = FireboltSDKErrorUnavailable;
@@ -182,6 +182,45 @@ uint32_t test_generated_properties_get_advertising_policy()
     }
     EXPECT_EQ(result, FireboltSDKErrorNone);
     return result;
+}
+
+#include <pthread.h>
+#include <string.h>
+pthread_cond_t cond = PTHREAD_COND_INITIALIZER;
+pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
+
+static const char deviceIdTestStr[] = "DeviceIdTestStr";
+static void NotifyDeviceIdChange(const void* userData, FireboltTypes_StringHandle handle)
+{
+    EXPECT_NE(handle, NULL);
+    if (handle) {
+        printf("\nGot new device.name :%s\n", FireboltTypes_String(handle));
+        FireboltTypes_StringHandle_Release(handle);
+    }
+    EXPECT_EQ(strncmp((const char*)userData, deviceIdTestStr, strlen(deviceIdTestStr)), 0);
+    pthread_mutex_lock(&lock);
+    pthread_cond_signal(&cond);
+    pthread_mutex_unlock(&lock);
+}
+uint32_t test_generated_event_device_name()
+{
+    uint32_t listenerId = 0;
+    uint32_t result = Device_ListenNameUpdate((const void*)NotifyDeviceIdChange, deviceIdTestStr, &listenerId);
+    EXPECT_EQ(result, FireboltSDKErrorNone);
+    EXPECT_NE(listenerId, 0);
+    if (result != FireboltSDKErrorNone) {
+        printf("Set event device.name status = %d \n", result);
+    } else {
+        printf("Set event device.name registered successfully\n");
+    }
+
+    pthread_mutex_lock(&lock);
+    printf("Waiting for device.name event\n");
+    pthread_cond_wait(&cond, &lock);
+    pthread_mutex_unlock(&lock);
+
+    result = Device_ListenDistributorUpdate(NULL, NULL, &listenerId);
+    EXPECT_EQ(result, FireboltSDKErrorNone);
 }
 
 #ifdef __cplusplus

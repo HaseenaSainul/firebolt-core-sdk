@@ -17,7 +17,7 @@
 cmake_minimum_required(VERSION 3.3)
 
 project(FireboltCore)
-option(ENABLE_TESTS "Build core sdk native test" OFF)
+option(ENABLE_TESTS "Build core sdk native test" ON)
 
 if (NOT SYSROOT_PATH)
     # Set sysroot to support PC builds, sysroot_path not configured case
