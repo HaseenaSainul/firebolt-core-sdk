@@ -219,7 +219,81 @@ uint32_t test_generated_event_device_name()
     pthread_cond_wait(&cond, &lock);
     pthread_mutex_unlock(&lock);
 
-    result = Device_ListenDistributorUpdate(NULL, NULL, &listenerId);
+    result = Device_ListenNameUpdate(NULL, NULL, &listenerId);
+    EXPECT_EQ(result, FireboltSDKErrorNone);
+}
+
+static const char deviceScreenResolutionTestStr[] = "deviceScreenResolutionTestStr";
+static void NotifyDeviceScreenResolutionChange(const void* userData, Device_ResolutionArrayHandle handle)
+{
+    EXPECT_EQ(Device_ResolutionArrayHandle_IsValid(handle), true);
+    if (Device_ResolutionArrayHandle_IsValid(handle) == true) {
+        uint32_t size = Device_ResolutionArray_Size(handle);
+        printf("Device ScreenResolutions changed for %d numbers\n", size);
+        for (uint32_t i = 0; i < size; ++i) {
+            printf("New reslution[%d] = %d\n", i, Device_ResolutionArray_Get(handle, i));
+        }
+        Device_ResolutionArrayHandle_Release(handle);
+    }
+    EXPECT_EQ(strncmp((const char*)userData, deviceScreenResolutionTestStr, strlen(deviceScreenResolutionTestStr)), 0);
+    pthread_mutex_lock(&lock);
+    pthread_cond_signal(&cond);
+    pthread_mutex_unlock(&lock);
+}
+uint32_t test_generated_event_device_screenresolution()
+{
+    uint32_t listenerId = 0;
+    uint32_t result = Device_ListenScreenResolutionUpdate((const void*)NotifyDeviceScreenResolutionChange, deviceScreenResolutionTestStr, &listenerId);
+    EXPECT_EQ(result, FireboltSDKErrorNone);
+    EXPECT_NE(listenerId, 0);
+    if (result != FireboltSDKErrorNone) {
+        printf("Set event device.screenresolution status = %d \n", result);
+    } else {
+        printf("Set event device.screenresolution registered successfully\n");
+    }
+
+    pthread_mutex_lock(&lock);
+    printf("Waiting for device.screenresolution event\n");
+    pthread_cond_wait(&cond, &lock);
+    pthread_mutex_unlock(&lock);
+
+    result = Device_ListenScreenResolutionUpdate(NULL, NULL, &listenerId);
+    EXPECT_EQ(result, FireboltSDKErrorNone);
+}
+
+static const char accessibilityVoiceGuidanceTestStr[] = "AccessibilityVoiceGuidanceTestStr";
+static void NotifyAccessibilityVoiceGuidanceChange(const void* userData, Accessibility_VoiceGuidanceSettingsHandle handle)
+{
+    EXPECT_EQ(Accessibility_VoiceGuidanceSettingsHandle_IsValid(handle), true);
+    if (Accessibility_VoiceGuidanceSettingsHandle_IsValid(handle) == true) {
+        bool enabled = Accessibility_VoiceGuidanceSettings_Get_Enabled(handle);
+        uint32_t speed = Accessibility_VoiceGuidanceSettings_Get_Speed(handle);
+        printf("VoiceGuidanceSettings: Enabled : %d, Speed : %d\n", enabled, speed);
+        Accessibility_VoiceGuidanceSettingsHandle_Release(handle);
+    }
+    EXPECT_EQ(strncmp((const char*)userData, accessibilityVoiceGuidanceTestStr, strlen(accessibilityVoiceGuidanceTestStr)), 0);
+    pthread_mutex_lock(&lock);
+    pthread_cond_signal(&cond);
+    pthread_mutex_unlock(&lock);
+}
+uint32_t test_generated_event_accessibility_voice_guidance_settings()
+{
+    uint32_t listenerId = 0;
+    uint32_t result = Accessibility_ListenVoiceGuidanceSettingsUpdate((const void*)NotifyAccessibilityVoiceGuidanceChange, accessibilityVoiceGuidanceTestStr, &listenerId);
+    EXPECT_EQ(result, FireboltSDKErrorNone);
+    EXPECT_NE(listenerId, 0);
+    if (result != FireboltSDKErrorNone) {
+        printf("Set event device.name status = %d \n", result);
+    } else {
+        printf("Set event accessibility.voiceguidance registered successfully\n");
+    }
+
+    pthread_mutex_lock(&lock);
+    printf("Waiting for accessibility.voiceguidance event\n");
+    pthread_cond_wait(&cond, &lock);
+    pthread_mutex_unlock(&lock);
+
+    result = Accessibility_ListenVoiceGuidanceSettingsUpdate(NULL, NULL, &listenerId);
     EXPECT_EQ(result, FireboltSDKErrorNone);
 }
 

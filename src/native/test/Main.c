@@ -44,6 +44,8 @@ int main()
     EXECUTE("test_generated_properties_get_accessibility_voiceguidancesettings", test_generated_properties_get_accessibility_voiceguidancesettings);
     EXECUTE("test_generated_properties_get_advertising_policy", test_generated_properties_get_advertising_policy);
     EXECUTE("test_generated_event_device_name", test_generated_event_device_name);
+    EXECUTE("test_generated_event_device_screenresolution", test_generated_event_device_screenresolution);
+    EXECUTE("test_generated_event_accessibility_voice_guidance_settings", test_generated_event_accessibility_voice_guidance_settings);
     test_firebolt_dispose_instance();
 
     printf("TOTAL: %i tests; %i PASSED, %i FAILED\n", TotalTests, TotalTestsPassed, (TotalTests - TotalTestsPassed));
