@@ -205,7 +205,7 @@ static void NotifyDeviceNameChange(const void* userData, FireboltTypes_StringHan
 uint32_t test_generated_event_device_name()
 {
     uint32_t listenerId = 0;
-    uint32_t result = Device_ListenNameUpdate((const void*)NotifyDeviceNameChange, deviceNameTestStr, &listenerId);
+    uint32_t result = Device_Register_NameUpdate((const void*)NotifyDeviceNameChange, deviceNameTestStr, &listenerId);
     EXPECT_EQ(result, FireboltSDKErrorNone);
     EXPECT_NE(listenerId, 0);
     if (result != FireboltSDKErrorNone) {
@@ -219,7 +219,7 @@ uint32_t test_generated_event_device_name()
         pthread_mutex_unlock(&lock);
     }
 
-    result = Device_ListenNameUpdate(NULL, NULL, &listenerId);
+    result = Device_Unregister_NameUpdate(listenerId);
     EXPECT_EQ(result, FireboltSDKErrorNone);
 }
 
@@ -243,7 +243,7 @@ static void NotifyDeviceScreenResolutionChange(const void* userData, Device_Reso
 uint32_t test_generated_event_device_screenresolution()
 {
     uint32_t listenerId = 0;
-    uint32_t result = Device_ListenScreenResolutionUpdate((const void*)NotifyDeviceScreenResolutionChange, deviceScreenResolutionTestStr, &listenerId);
+    uint32_t result = Device_Register_ScreenResolutionUpdate((const void*)NotifyDeviceScreenResolutionChange, deviceScreenResolutionTestStr, &listenerId);
     EXPECT_EQ(result, FireboltSDKErrorNone);
     EXPECT_NE(listenerId, 0);
     if (result != FireboltSDKErrorNone) {
@@ -257,7 +257,7 @@ uint32_t test_generated_event_device_screenresolution()
         pthread_mutex_unlock(&lock);
     }
 
-    result = Device_ListenScreenResolutionUpdate(NULL, NULL, &listenerId);
+    result = Device_Unregister_ScreenResolutionUpdate(listenerId);
     EXPECT_EQ(result, FireboltSDKErrorNone);
 }
 
@@ -279,7 +279,7 @@ static void NotifyAccessibilityVoiceGuidanceChange(const void* userData, Accessi
 uint32_t test_generated_event_accessibility_voice_guidance_settings()
 {
     uint32_t listenerId = 0;
-    uint32_t result = Accessibility_ListenVoiceGuidanceSettingsUpdate((const void*)NotifyAccessibilityVoiceGuidanceChange, accessibilityVoiceGuidanceTestStr, &listenerId);
+    uint32_t result = Accessibility_Register_VoiceGuidanceSettingsUpdate((const void*)NotifyAccessibilityVoiceGuidanceChange, accessibilityVoiceGuidanceTestStr, &listenerId);
     EXPECT_EQ(result, FireboltSDKErrorNone);
     EXPECT_NE(listenerId, 0);
     if (result != FireboltSDKErrorNone) {
@@ -293,7 +293,7 @@ uint32_t test_generated_event_accessibility_voice_guidance_settings()
         pthread_mutex_unlock(&lock);
     }
 
-    result = Accessibility_ListenVoiceGuidanceSettingsUpdate(NULL, NULL, &listenerId);
+    result = Accessibility_Unregister_VoiceGuidanceSettingsUpdate(listenerId);
     EXPECT_EQ(result, FireboltSDKErrorNone);
 }
 

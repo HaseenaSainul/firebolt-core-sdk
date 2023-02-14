@@ -17,6 +17,7 @@
 cmake_minimum_required(VERSION 3.3)
 
 project(FireboltCore)
+option(FIREBOLT_ENABLE_STATIC_LIB "Create Firebolt library as Static library" ON)
 option(ENABLE_TESTS "Build core sdk native test" ON)
 
 if (NOT SYSROOT_PATH)
