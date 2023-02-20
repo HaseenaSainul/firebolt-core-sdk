@@ -29,12 +29,10 @@ add_library(${TARGET} ${FIREBOLT_LIBRARY_TYPE}
     )
 
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-find_package(${NAMESPACE}Core CONFIG REQUIRED)
 find_package(${FIREBOLT_NAMESPACE}SDK CONFIG REQUIRED)
 
 target_link_libraries(${TARGET}
     PUBLIC
-        ${NAMESPACE}Core::${NAMESPACE}Core
         ${FIREBOLT_NAMESPACE}SDK::${FIREBOLT_NAMESPACE}SDK
 )
 target_include_directories(${TARGET}
