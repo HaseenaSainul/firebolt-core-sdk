@@ -238,16 +238,16 @@ uint32_t test_generated_event_device_name_with_register_same_callback()
     EXPECT_EQ(result, FireboltSDKErrorNone);
 }
 static const char deviceScreenResolutionTestStr[] = "deviceScreenResolutionTestStr";
-static void NotifyDeviceScreenResolutionChange(const void* userData, Device_ResolutionArrayHandle handle)
+static void NotifyDeviceScreenResolutionChange(const void* userData, Device_ResolutionIntegerArrayHandle handle)
 {
-    EXPECT_EQ(Device_ResolutionArrayHandle_IsValid(handle), true);
-    if (Device_ResolutionArrayHandle_IsValid(handle) == true) {
-        uint32_t size = Device_ResolutionArray_Size(handle);
+    EXPECT_EQ(Device_ResolutionIntegerArrayHandle_IsValid(handle), true);
+    if (Device_ResolutionIntegerArrayHandle_IsValid(handle) == true) {
+        uint32_t size = Device_ResolutionIntegerArray_Size(handle);
         printf("Device ScreenResolutions changed for %d numbers\n", size);
         for (uint32_t i = 0; i < size; ++i) {
-            printf("New reslution[%d] = %d\n", i, Device_ResolutionArray_Get(handle, i));
+            printf("New reslution[%d] = %d\n", i, Device_ResolutionIntegerArray_Get(handle, i));
         }
-        Device_ResolutionArrayHandle_Release(handle);
+        Device_ResolutionIntegerArrayHandle_Release(handle);
     }
     EXPECT_EQ(strncmp((const char*)userData, deviceScreenResolutionTestStr, strlen(deviceScreenResolutionTestStr)), 0);
     pthread_cond_signal(&cond);
