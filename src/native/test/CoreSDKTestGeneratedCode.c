@@ -16,6 +16,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+#include <unistd.h>
+
 #include "CoreSDKCTests.h"
 #include "CoreSDKTestGeneratedCode.h"
 
@@ -23,6 +25,7 @@
 #include "Advertising.h"
 #include "Common/Types.h"
 #include "Device.h"
+#include "Lifecycle.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -301,6 +304,17 @@ uint32_t test_generated_event_accessibility_voice_guidance_settings()
 
     result = Accessibility_Unregister_VoiceGuidanceSettingsUpdate((const void*)NotifyAccessibilityVoiceGuidanceChange);
     EXPECT_EQ(result, FireboltSDKErrorNone);
+}
+uint32_t test_generated_calls_metrics_lifecycle_ready()
+{
+    uint32_t result = Lifecycle_Ready();
+    if (result != FireboltSDKErrorNone) {
+        printf("Lifecycle.ready call status = %d \n", result);
+    } else {
+        printf("Lifecycle.ready is called successfully\n");
+    }
+    // Just add sleep() to keep the test process in active for a while, since the test process should be in-active to invoke worker pool dispatcher (for calls-metrics mehods). This sleep is not required for actual apps case.
+    sleep(1);
 }
 
 #ifdef __cplusplus

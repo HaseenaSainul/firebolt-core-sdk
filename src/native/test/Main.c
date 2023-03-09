@@ -16,6 +16,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+#include <ctype.h>
 #include "CoreSDKCTests.h"
 #include "CoreSDKTestGeneratedCode.h"
 
@@ -47,6 +48,8 @@ int main()
     EXECUTE("test_generated_event_device_name_with_register_same_callback", test_generated_event_device_name_with_register_same_callback);
     EXECUTE("test_generated_event_device_screenresolution", test_generated_event_device_screenresolution);
     EXECUTE("test_generated_event_accessibility_voice_guidance_settings", test_generated_event_accessibility_voice_guidance_settings);
+    EXECUTE("test_generated_calls_metrics_lifecycle_ready", test_generated_calls_metrics_lifecycle_ready);
+
     test_firebolt_dispose_instance();
 
     printf("TOTAL: %i tests; %i PASSED, %i FAILED\n", TotalTests, TotalTestsPassed, (TotalTests - TotalTestsPassed));

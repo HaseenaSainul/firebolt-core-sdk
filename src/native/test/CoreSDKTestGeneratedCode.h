@@ -33,6 +33,7 @@ uint32_t test_generated_event_device_name();
 uint32_t test_generated_event_device_name_with_register_same_callback();
 uint32_t test_generated_event_device_screenresolution();
 uint32_t test_generated_event_accessibility_voice_guidance_settings();
+uint32_t test_generated_calls_metrics_lifecycle_ready();
 
 #ifdef __cplusplus
 }
