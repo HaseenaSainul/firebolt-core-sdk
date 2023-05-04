@@ -220,6 +220,7 @@ uint32_t test_generated_event_device_name()
 
     result = Device_Unregister_NameUpdate((const void*)NotifyDeviceNameChange);
     EXPECT_EQ(result, FireboltSDKErrorNone);
+    return result;
 }
 
 uint32_t test_generated_event_device_name_with_register_same_callback()
@@ -239,6 +240,7 @@ uint32_t test_generated_event_device_name_with_register_same_callback()
 
     result = Device_Unregister_NameUpdate((const void*)NotifyDeviceNameChange);
     EXPECT_EQ(result, FireboltSDKErrorNone);
+    return result;
 }
 static const char deviceScreenResolutionTestStr[] = "deviceScreenResolutionTestStr";
 static void NotifyDeviceScreenResolutionChange(const void* userData, Device_ResolutionIntegerArrayHandle handle)
@@ -272,6 +274,7 @@ uint32_t test_generated_event_device_screenresolution()
 
     result = Device_Unregister_ScreenResolutionUpdate((const void*)NotifyDeviceScreenResolutionChange);
     EXPECT_EQ(result, FireboltSDKErrorNone);
+    return result;
 }
 
 static const char accessibilityVoiceGuidanceTestStr[] = "AccessibilityVoiceGuidanceTestStr";
@@ -304,6 +307,7 @@ uint32_t test_generated_event_accessibility_voice_guidance_settings()
 
     result = Accessibility_Unregister_VoiceGuidanceSettingsUpdate((const void*)NotifyAccessibilityVoiceGuidanceChange);
     EXPECT_EQ(result, FireboltSDKErrorNone);
+    return result;
 }
 uint32_t test_generated_calls_metrics_lifecycle_ready()
 {
@@ -315,6 +319,7 @@ uint32_t test_generated_calls_metrics_lifecycle_ready()
     }
     // Just add sleep() to keep the test process in active for a while, since the test process should be in-active to invoke worker pool dispatcher (for calls-metrics mehods). This sleep is not required for actual apps case.
     sleep(1);
+    return result;
 }
 
 #ifdef __cplusplus
