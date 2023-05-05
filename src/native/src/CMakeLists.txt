@@ -20,8 +20,12 @@ project(FireboltCoreSDK)
 project_version(1.0.0)
 set(TARGET ${PROJECT_NAME})
 message("Setup ${TARGET} v${PROJECT_VERSION}")
-file(GLOB GENERATED_SOURCES "${GENERATED_CODE_PATH}/src/*.cpp")
 
+file(GLOB GENERATED_SOURCES "${GENERATED_CODE_PATH}generated/src/*.cpp")
+
+if (NOT LIBDIR)
+    set(LIBDIR "src")
+endif()
 
 add_library(${TARGET} ${FIREBOLT_LIBRARY_TYPE}
     Module.cpp
@@ -38,8 +42,8 @@ target_link_libraries(${TARGET}
 target_include_directories(${TARGET}
     PRIVATE
          $<BUILD_INTERFACE:${SYSROOT_PATH}/usr/include>
-         $<BUILD_INTERFACE:${SYSROOT_PATH}/usr/include/${FIREBOLT_NAMESPACE}>
-         $<BUILD_INTERFACE:${GENERATED_CODE_PATH}/include>
+         $<BUILD_INTERFACE:${FIREBOLT_PATH}/usr/include/${FIREBOLT_NAMESPACE}>
+         $<BUILD_INTERFACE:${GENERATED_CODE_PATH}generated/include>
 )
 
 set_target_properties(${TARGET} PROPERTIES
@@ -67,7 +71,7 @@ InstallHeaders(
     DESTINATION ${FIREBOLT_NAMESPACE}/generated
 )
 
-InstallLibraries(TARGET ${TARGET} ${FIREBOLT_LIBRARY_TYPE} LIBRARIES ${TARGET} DESTINATION ${FIREBOLT_NAMESPACE})
+InstallLibraries(TARGET ${TARGET} ${FIREBOLT_LIBRARY_TYPE} LIBDIR ${LIBDIR} LIBRARIES ${TARGET} DESTINATION ${FIREBOLT_NAMESPACE})
 InstallCMakeConfig(TARGETS ${TARGET})
 InstallPackageConfig(TARGETS ${TARGET} DESCRIPTION "Firebolt Core SDK Library")
 InstallCMakeConfigs(TARGET ${TARGET} DESTINATION ${FIREBOLT_NAMESPACE})

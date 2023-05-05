@@ -39,9 +39,9 @@ target_link_libraries(${TESTLIB}
 target_include_directories(${TESTLIB}
     PRIVATE
     $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/Source>
-    $<BUILD_INTERFACE:${GENERATED_CODE_PATH}/include>
+    $<BUILD_INTERFACE:${GENERATED_CODE_PATH}generated/include>
     $<BUILD_INTERFACE:${SYSROOT_PATH}/usr/include>
-    $<BUILD_INTERFACE:${SYSROOT_PATH}/usr/include/${FIREBOLT_NAMESPACE}>
+    $<BUILD_INTERFACE:${FIREBOLT_PATH}/usr/include/${FIREBOLT_NAMESPACE}>
     $<INSTALL_INTERFACE:include/${FIREBOLT_NAMESPACE}Test>
 )
 
@@ -65,8 +65,8 @@ target_link_libraries(${TESTAPP}
 
 target_include_directories(${TESTAPP}
     PRIVATE
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/../>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SRC_DIR}/>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SRC_DIR}/../>
 )
 
 install(
