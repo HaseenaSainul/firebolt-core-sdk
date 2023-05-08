@@ -26,7 +26,7 @@
     "prepare": "husky install",
     "prepack": "npm run fs:setup && npm run build:openrpc && npm run build:sdk && npm run dist:sdk && npm run dist:declarations",
     "nativesdk:prepare": "npm run build:csdk",
-    "nativesdk:configure": "cmake-js reconfigure --directory src/native --CDSYSROOT_PATH=${SYSROOT_PATH} --CDGENERATED_CODE_PATH=${PWD}/build/sdk/native-c/ --CDENABLE_TESTS=${ENABLE_TESTS} --CDLIBDIR=Release",
+    "nativesdk:configure": "cmake-js reconfigure --directory src/native --CDSYSROOT_PATH=${SYSROOT_PATH} --CDGENERATED_CODE_PATH=${PWD}/build/sdk/native-c/ --CDENABLE_TESTS=${ENABLE_TESTS} --CDLIBDIR=../Release --CDNATIVE_BUILD=ON",
     "nativesdk:compile": "cmake-js build --directory src/native",
     "nativesdk:setup": "npm run nativesdk:configure && npm run nativesdk:compile",
     "nativesdk:install": "NODE_INSTALL_PATH=${PWD}/firebolt TARGET_NAME=Firebolt node src/native/scripts/install.js",

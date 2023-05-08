@@ -24,13 +24,8 @@ if (NOT SYSROOT_PATH)
     # Set sysroot to support PC builds, sysroot_path not configured case
     set(SYSROOT_PATH "${CMAKE_SOURCE_DIR}/../../node_modules/@firebolt-js/openrpc/firebolt" CACHE INTERNAL "" FORCE)
 endif()
-if (NOT FIREBOLT_PATH)
-   if (EXISTS "${CMAKE_SOURCE_DIR}/../openrpc/build/Firebolt")
-       set(FIREBOLT_PATH "${CMAKE_SOURCE_DIR}/../openrpc/build/Firebolt"  CACHE INTERNAL "" FORCE)
-   endif()
-endif()
 if (NOT GENERATED_CODE_PATH)
-    set(GENERATED_CODE_PATH "${CMAKE_SOURCE_DIR}/"  CACHE INTERNAL "" FORCE)
+    set(GENERATED_CODE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/"  CACHE INTERNAL "" FORCE)
 endif()
 
 if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
@@ -39,10 +34,11 @@ if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
 endif()
 
 list(APPEND CMAKE_MODULE_PATH
+	"${CMAKE_SOURCE_DIR}/cmake"
 	"${SYSROOT_PATH}/usr/lib/cmake"
 	"${SYSROOT_PATH}/tools/cmake")
 
-if (FIREBOLT_PATH)
+if (FIREBOLT_PATH AND NOT ${FIREBOLT_PATH} STREQUAL ${SYSROOT_PATH})
     set(CMAKE_FIREBOLT_PATH
         "${FIREBOLT_PATH}/usr/lib/cmake/Firebolt"
 	"${FIREBOLT_PATH}/usr/lib/cmake/FireboltSDK")
@@ -52,16 +48,32 @@ if (FIREBOLT_PATH)
     list(APPEND CMAKE_PREFIX_PATH ${CMAKE_FIREBOLT_PATH})
     list(APPEND CMAKE_MODULE_PATH ${CMAKE_FIREBOLT_PATH})
 else ()
-   set(FIREBOLT_PATH "${SYSROOT_PATH}" CACHE INTERNAL "" FORCE)
+    set(FIREBOLT_PATH "${SYSROOT_PATH}" CACHE INTERNAL "" FORCE)
+    if (FIREBOLT_ENABLE_STATIC_LIB)
+        set(FIREBOLT_LIBRARY_TYPE STATIC)
+    else ()
+        set(FIREBOLT_LIBRARY_TYPE SHARED)
+    endif ()
 endif ()
 
 find_package(WPEFramework CONFIG REQUIRED)
-find_package(Firebolt CONFIG REQUIRED)
+find_package(WPEFrameworkWebSocket CONFIG)
+
+if (NATIVE_BUILD)
+    find_package(Firebolt CONFIG REQUIRED)
+    find_package(${FIREBOLT_NAMESPACE}SDK CONFIG REQUIRED)
+    if (ENABLE_TESTS)
+        find_package(${FIREBOLT_NAMESPACE}SDKTests CONFIG REQUIRED)
+    endif()
+else()
+    if (NOT OPENRPC_INC)
+        set(OPENRPC_INC "${CMAKE_SOURCE_DIR}/openrpc/"  CACHE INTERNAL "" FORCE)
+    endif()
+endif()
 
 include(HelperFunctions)
 
 add_subdirectory(src)
-
 if (ENABLE_TESTS)
    add_subdirectory(test)
 endif()
