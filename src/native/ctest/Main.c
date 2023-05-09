@@ -7,6 +7,8 @@
 #include "Account.h"
 #include "Advertising.h"
 #include "Device.h"
+#include "Discovery.h"
+#include "Common/Entertainment.h"
 
 void ShowMenu()
 {
@@ -17,6 +19,7 @@ void ShowMenu()
            "\tG : Get Voice Guidance Settings\n"
            "\tP : Get Advertising Policy\n"
            "\tU : Get Account UID\n"
+           "\tE : Push EntityInfo\n"
            "\tN : Register/Unregister for Device Name change\n"
            "\tR : Register/Unregister for Screen Resolution change\n"
            "\tA : Register/Unregister for Accessibilty Voice Guidance change\n"
@@ -289,6 +292,108 @@ int main (int argc, char* argv[])
                 printf("Failed to get Advertising Policy\n\n");
             }
             break;
+        }
+        case 'E': {
+            {
+                Discovery_EntityInfoFederatedResponseHandle federatedResponse = Discovery_EntityInfoFederatedResponseHandle_Create();
+                Discovery_EntityInfoResultHandle entityInfoResult = Discovery_EntityInfoResultHandle_Create();
+                Discovery_EntityInfoHandle entityInfo = Discovery_EntityInfoHandle_Create();
+
+                //Populate the ContentIdentifiers Object
+                Discovery_ContentIdentifiersHandle ci = Discovery_ContentIdentifiersHandle_Create();
+                Discovery_ContentIdentifiers_Set_AssetId(ci, "12345678");
+                Discovery_ContentIdentifiers_Set_EntityId(ci, "ABCDEFGH");
+                Discovery_ContentIdentifiers_Set_SeasonId(ci, "1");
+                Discovery_ContentIdentifiers_Set_SeriesId(ci, "9ER34FR");
+                Discovery_ContentIdentifiers_Set_AppContentData(ci, "Sample App Content Data");
+
+                //Populate EntityInfo Object
+                //Set the ContentIdentifiers Object to EntityInfo Object
+                Discovery_EntityInfo_Set_Identifiers(entityInfo, ci);
+                Discovery_EntityInfo_Set_Title(entityInfo, "Game Of Thrones");
+                Discovery_EntityInfo_Set_EntityType(entityInfo, "program");
+                Discovery_EntityInfo_Set_ProgramType(entityInfo, ENTERTAINMENT_PROGRAMTYPE_SEASON);
+                Discovery_EntityInfo_Set_Synopsis(entityInfo, "The imaginary continent of Westeros was once inhabited by a magical people, the Children of the Forest. For centuries, other people came across the Narrow Sea from the eastern continent of Essos: up North, the First Men; in the Center, the Andals; down South, the Dornish.");
+                Discovery_EntityInfo_Set_SeasonNumber(entityInfo, 1);
+                Discovery_EntityInfo_Set_EpisodeNumber(entityInfo, 1);
+                Discovery_EntityInfo_Set_ReleaseDate(entityInfo, "2012-04-23T18:25:43.511Z");
+                {
+                    //Populate the ContentRatings Handle for US TV scheme
+                    Discovery_ContentRatingHandle cr = Discovery_ContentRatingHandle_Create();
+                    Discovery_ContentRating_Set_Scheme(cr, DISCOVERY_SCHEME_US_TV);
+                    Discovery_ContentRating_Set_Rating(cr, "TVMA");
+                    Discovery_ContentRating_AdvisoriesArray_Add(cr, "V");
+                    Discovery_ContentRating_AdvisoriesArray_Add(cr, "S");
+                    Discovery_ContentRating_AdvisoriesArray_Add(cr, "L");
+                    Discovery_EntityInfo_ContentRatingsArray_Add(entityInfo, cr);
+                }
+
+                {
+                    //Populate the ContentRatings Handle for US TV scheme
+                    Discovery_ContentRatingHandle cr = Discovery_ContentRatingHandle_Create();
+                    Discovery_ContentRating_Set_Scheme(cr, DISCOVERY_SCHEME_CA_TV);
+                    Discovery_ContentRating_Set_Rating(cr, "18+");
+                    Discovery_ContentRating_AdvisoriesArray_Add(cr, "18+");
+                    Discovery_EntityInfo_ContentRatingsArray_Add(entityInfo, cr);
+                }
+
+                //Populate WayToWatch Array in EntityInfo
+                {
+                    //Populate the WayToWatch Object
+                    Discovery_WayToWatchHandle w2w = Discovery_WayToWatchHandle_Create();
+                    {
+                         //Add the ContentIdentifiers Object in WayToWatch
+                        Discovery_ContentIdentifiersHandle ciI = Discovery_ContentIdentifiersHandle_Create();
+                        Discovery_ContentIdentifiers_Set_AssetId(ciI, "12345678");
+                        Discovery_ContentIdentifiers_Set_EntityId(ciI, "ABCDEFGH");
+                        Discovery_ContentIdentifiers_Set_SeasonId(ciI, "1");
+                        Discovery_ContentIdentifiers_Set_SeriesId(ciI, "9ER34FR");
+                        Discovery_ContentIdentifiers_Set_AppContentData(ciI, "Sample App Content Data");
+                        Discovery_WayToWatch_Set_Identifiers(w2w, ciI);
+                    }
+                    Discovery_WayToWatch_Set_Expires(w2w, "2014-04-23T18:25:43.511Z");
+                    Discovery_WayToWatch_Set_Entitled(w2w, true);
+                    Discovery_WayToWatch_Set_EntitledExpires(w2w, "2014-04-23T18:25:43.511Z");
+                    Discovery_WayToWatch_Set_OfferingType(w2w, ENTERTAINMENT_OFFERINGTYPE_FREE);
+                    Discovery_WayToWatch_Set_HasAds(w2w, true);
+                    Discovery_WayToWatch_VideoQualityArray_Add(w2w, DISCOVERY_VIDEOQUALITY_HD);
+                    Discovery_WayToWatch_VideoQualityArray_Add(w2w, DISCOVERY_VIDEOQUALITY_UHD);
+                    Discovery_WayToWatch_AudioProfileArray_Add(w2w, TYPES_AUDIOPROFILE_STEREO);
+                    Discovery_WayToWatch_AudioProfileArray_Add(w2w, TYPES_AUDIOPROFILE_DOLBY_DIGITAL_5_1);
+                    Discovery_WayToWatch_AudioProfileArray_Add(w2w, TYPES_AUDIOPROFILE_DOLBY_DIGITAL_5_1_PLUS);
+
+                    Discovery_WayToWatch_AudioLanguagesArray_Add(w2w, "en");
+                    Discovery_WayToWatch_AudioLanguagesArray_Add(w2w, "fr");
+
+                    Discovery_WayToWatch_ClosedCaptionsArray_Add(w2w, "en");
+                    Discovery_WayToWatch_ClosedCaptionsArray_Add(w2w, "fr");
+
+                    Discovery_WayToWatch_SubtitlesArray_Add(w2w, "en");
+                    Discovery_WayToWatch_SubtitlesArray_Add(w2w, "fr");
+
+                    Discovery_WayToWatch_AudioDescriptionsArray_Add(w2w, "en");
+
+                    Discovery_EntityInfo_WaysToWatchArray_Add(entityInfo, w2w);
+              }
+
+                //Populate EntityInfoResult Object
+                Discovery_EntityInfoResult_Set_Expires(entityInfoResult, "2012-06-23T18:25:43.511Z");
+                Discovery_EntityInfoResult_Set_Entity(entityInfoResult, entityInfo);
+
+                //Populate the EntityInfoFederatedRespnse
+                Discovery_EntityInfoFederatedResponse_Set_EntityInfoFederatedResponseResult(federatedResponse, entityInfoResult);
+
+
+                //All Set, Call the Push
+                uint32_t result = Discovery_PushEntityInfo(federatedResponse);
+                if (result == FireboltSDKErrorNone) {
+                    printf("\nSuccessfully Pushed entityInfo\n");
+
+                } else {
+                    printf("\nFailed to Push entityInfo\n");
+                }
+                break;
+            }
         }
         case 'R': {
             HandleEventListener(Device, ScreenResolution, (const void*)NotifyDeviceScreenResolutionChange, deviceScreenResolutionTestStr, "device.screenresolution")
