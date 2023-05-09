@@ -1,7 +1,131 @@
 #include <stdio.h>
-#include "Firebolt.h"
-#include "Device.h"
 #include <assert.h>
+#include <ctype.h>
+
+#include "Firebolt.h"
+#include "Accessibility.h"
+#include "Account.h"
+#include "Advertising.h"
+#include "Device.h"
+
+void ShowMenu()
+{
+    printf("Enter\n"
+           "\tI : Get Device ID\n"
+           "\tV : Get Device Version\n"
+           "\tS : Get Closed Caption Settings\n"
+           "\tG : Get Voice Guidance Settings\n"
+           "\tP : Get Advertising Policy\n"
+           "\tU : Get Account UID\n"
+           "\tN : Register/Unregister for Device Name change\n"
+           "\tR : Register/Unregister for Screen Resolution change\n"
+           "\tA : Register/Unregister for Accessibilty Voice Guidance change\n"
+           "\tQ : Quit\n\n"
+          );
+}
+
+void ShowEventMenu()
+{
+    printf("Enter\n"
+         "\tR: Register Event\n"
+         "\tU: Unregister Event\n"
+         "\tQ : Quit\n");
+}
+
+#define HandleEventListener(Module, eventFuncName, Callback, eventTestStr, eventName) \
+{ \
+    int opt; \
+    do { \
+        getchar(); \
+        ShowEventMenu(); \
+        printf("Enter option : "); \
+        opt = toupper(getchar()); \
+        switch (opt) { \
+        case 'R': { \
+            uint32_t result = Module##_Register_##eventFuncName##Update((const void*)Callback, eventTestStr); \
+            if (result != FireboltSDKErrorNone) { \
+                printf("Register event %s is failed, status = %d \n", eventName, result); \
+            } else { \
+                printf("Event %s is registered successfully\n", eventName); \
+            } \
+            break; \
+        } \
+        case 'U': { \
+            uint32_t result = Module##_Unregister_##eventFuncName##Update((const void*)Callback); \
+            if (result != FireboltSDKErrorNone) { \
+                printf("Unregister event %s is failed, status = %d \n", eventName, result); \
+            } else { \
+                printf("Event %s is unregistered successfully\n", eventName); \
+            } \
+            break; \
+        } \
+        default: \
+            break; \
+        } \
+    } while (opt != 'Q'); \
+}
+
+const char* get_skiprestriction_enum_string(Advertising_SkipRestriction skipRestriction)
+{
+    char* strSkipRestriction;
+    switch(skipRestriction) {
+    case ADVERTISING_SKIPRESTRICTION_NONE:
+        strSkipRestriction = "None";
+        break;
+    case ADVERTISING_SKIPRESTRICTION_ADS_UNWATCHED:
+        strSkipRestriction = "AdsUnwatched";
+        break;
+    case ADVERTISING_SKIPRESTRICTION_ADS_ALL:
+        strSkipRestriction = "AdsAll";
+        break;
+    case ADVERTISING_SKIPRESTRICTION_ALL:
+        strSkipRestriction = "All";
+        break;
+    default:
+        strSkipRestriction = "None";
+        break;
+    }
+    return strSkipRestriction;
+}
+
+static const char deviceNameTestStr[] = "DeviceNameTestStr";
+static void NotifyDeviceNameChange(const void* userData, FireboltTypes_StringHandle handle)
+{
+    if (handle) {
+        printf("Got new device.name :%s\n", FireboltTypes_String(handle));
+        FireboltTypes_StringHandle_Release(handle);
+    } else {
+        printf("device.name event handle is not valid\n");
+    }
+}
+
+static const char deviceScreenResolutionTestStr[] = "deviceScreenResolutionTestStr";
+static void NotifyDeviceScreenResolutionChange(const void* userData, Device_ResolutionIntegerArrayHandle handle)
+{
+    if (Device_ResolutionIntegerArrayHandle_IsValid(handle) == true) {
+        uint32_t size = Device_ResolutionIntegerArray_Size(handle);
+        printf("Device ScreenResolutions changed for %d numbers\n", size);
+        for (uint32_t i = 0; i < size; ++i) {
+            printf("New reslution[%d] = %d\n", i, Device_ResolutionIntegerArray_Get(handle, i));
+        }
+        Device_ResolutionIntegerArrayHandle_Release(handle);
+    } else {
+        printf("device.screenresolution event handle is not valid\n");
+    }
+}
+
+static const char accessibilityVoiceGuidanceTestStr[] = "AccessibilityVoiceGuidanceTestStr";
+static void NotifyAccessibilityVoiceGuidanceChange(const void* userData, Accessibility_VoiceGuidanceSettingsHandle handle)
+{
+    if (Accessibility_VoiceGuidanceSettingsHandle_IsValid(handle) == true) {
+        bool enabled = Accessibility_VoiceGuidanceSettings_Get_Enabled(handle);
+        uint32_t speed = Accessibility_VoiceGuidanceSettings_Get_Speed(handle);
+        printf("VoiceGuidanceSettings: Enabled : %d, Speed : %d\n", enabled, speed);
+        Accessibility_VoiceGuidanceSettingsHandle_Release(handle);
+    } else {
+        printf("accessibility.voiceguidance event handle is not valid\n");
+    }
+}
 
 int main (int argc, char* argv[])
 {
@@ -15,57 +139,174 @@ int main (int argc, char* argv[])
     \"wsUrl\": \"ws://127.0.0.1:9998\"\
 }";
 
-    FireboltTypes_StringHandle handle;
-
     printf("Firebolt Core SDK Test\n");
     
     //Intitialize the SDK
     FireboltSDK_Initialize(config);
+    int option;
 
-    //Lets get the Device ID
-    uint32_t result = Device_GetId(&handle);
-    if (result == FireboltSDKErrorNone) {
-        printf("\nDevice: Id:%s\n", FireboltTypes_String(handle));
-        FireboltTypes_StringHandle_Release(handle);
-        handle = NULL;
-    }
-    else {
-        printf("\nFailed to get Device ID\n");
-    }
-
-    {
-        Device_VersionsHandle handle;
-        uint32_t result = Device_GetVersion(&handle);
-        if (result == FireboltSDKErrorNone) {
-            assert(Device_VersionsHandle_IsValid(handle)); 
-            Types_SemanticVersionHandle sdkHandle = Device_Versions_Get_Sdk(handle);
-            if (Types_SemanticVersionHandle_IsValid(sdkHandle)) {
-                uint32_t major = Types_SemanticVersion_Get_Major(sdkHandle);
-                uint32_t minor = Types_SemanticVersion_Get_Minor(sdkHandle);
-                uint32_t patch = Types_SemanticVersion_Get_Patch(sdkHandle);
-                char* readable = Types_SemanticVersion_Get_Readable(sdkHandle);
-                printf("\nDevice:SDK Version major:%d minor:%d patch:%d readable:%s\n",
-                major, minor, patch, readable);
-                Types_SemanticVersionHandle_Release(sdkHandle);
-                result = FireboltSDKErrorNone;
+    do {
+        ShowMenu();
+        printf("Enter option : ");
+        option = toupper(getchar());
+        switch (option) {
+        case 'I': {
+            //Lets get the Device ID
+            FireboltTypes_StringHandle handle;
+            uint32_t result = Device_GetId(&handle);
+            if (result == FireboltSDKErrorNone) {
+                printf("Device: Id:%s\n\n", FireboltTypes_String(handle));
+                FireboltTypes_StringHandle_Release(handle);
+                handle = NULL;
+            } else {
+                printf("Failed to get Device ID\n\n");
             }
-            Types_SemanticVersionHandle osHandle = Device_Versions_Get_Os(handle);
-            if (Types_SemanticVersionHandle_IsValid(osHandle)) {
-                uint32_t major = Types_SemanticVersion_Get_Major(osHandle);
-                uint32_t minor = Types_SemanticVersion_Get_Minor(osHandle);
-                uint32_t patch = Types_SemanticVersion_Get_Patch(osHandle);
-                const char* readable = Types_SemanticVersion_Get_Readable(osHandle);
-                printf("\nDevice:OS  Version major:%d minor:%d patch:%d readable:%s\n",
-                major, minor, patch, readable);
-                Types_SemanticVersionHandle_Release(osHandle);
-                result = FireboltSDKErrorNone;
-            }
-            Device_VersionsHandle_Release(handle);
-        } else {
-            printf("\nFailed to get Device Version\n");
+            break;
         }
+        case 'V': {
+            Device_VersionsHandle handle;
+            uint32_t result = Device_GetVersion(&handle);
+            if (result == FireboltSDKErrorNone) {
+                assert(Device_VersionsHandle_IsValid(handle));
+                Types_SemanticVersionHandle sdkHandle = Device_Versions_Get_Sdk(handle);
+                if (Types_SemanticVersionHandle_IsValid(sdkHandle)) {
+                    uint32_t major = Types_SemanticVersion_Get_Major(sdkHandle);
+                    uint32_t minor = Types_SemanticVersion_Get_Minor(sdkHandle);
+                    uint32_t patch = Types_SemanticVersion_Get_Patch(sdkHandle);
+                    char* readable = Types_SemanticVersion_Get_Readable(sdkHandle);
+                    printf("Device:SDK Version major:%d minor:%d patch:%d readable:%s\n",
+                    major, minor, patch, readable);
+                    Types_SemanticVersionHandle_Release(sdkHandle);
+                    result = FireboltSDKErrorNone;
+                }
+                Types_SemanticVersionHandle osHandle = Device_Versions_Get_Os(handle);
+                if (Types_SemanticVersionHandle_IsValid(osHandle)) {
+                    uint32_t major = Types_SemanticVersion_Get_Major(osHandle);
+                    uint32_t minor = Types_SemanticVersion_Get_Minor(osHandle);
+                    uint32_t patch = Types_SemanticVersion_Get_Patch(osHandle);
+                    const char* readable = Types_SemanticVersion_Get_Readable(osHandle);
+                    printf("Device:OS  Version major:%d minor:%d patch:%d readable:%s\n\n",
+                    major, minor, patch, readable);
+                    Types_SemanticVersionHandle_Release(osHandle);
+                    result = FireboltSDKErrorNone;
+                }
+                Device_VersionsHandle_Release(handle);
+            } else {
+                printf("Failed to get Device Version\n\n");
+            }
+            break;
+        }
+	case 'S': {
+            Accessibility_ClosedCaptionsSettingsHandle handle;
+            uint32_t result = Accessibility_GetClosedCaptionsSettings(&handle);
 
-    }
+            if (result == FireboltSDKErrorNone) {
+                if (Accessibility_ClosedCaptionsSettingsHandle_IsValid(handle) == true) {
+                    printf("ClosedCaption Settings ------------------\n");
+                    Accessibility_ClosedCaptionsStylesHandle styleHandle = Accessibility_ClosedCaptionsSettings_Get_Styles(handle);
+                    if (Accessibility_ClosedCaptionsStylesHandle_IsValid(styleHandle)) {
+                        printf("ClosedCaptionStyles:\n");
+                        char* fontFamily = Accessibility_ClosedCaptionsStyles_Get_FontFamily(styleHandle);
+                        printf("\tFontFamily : %s\n", fontFamily);
+                        uint32_t fontSize = Accessibility_ClosedCaptionsStyles_Get_FontSize(styleHandle);
+                        printf("\tFontSize : %d\n", fontSize);
+                        char* fontColor = Accessibility_ClosedCaptionsStyles_Get_FontColor(styleHandle);
+                        printf("\tFontColor : %s\n", fontColor);
+                        char* fontEdge = Accessibility_ClosedCaptionsStyles_Get_FontEdge(styleHandle);
+                        printf("\tFontEdge : %s\n", fontEdge);
+                        char* fontEdgeColor = Accessibility_ClosedCaptionsStyles_Get_FontEdgeColor(styleHandle);
+                        printf("\tFontEdgeColor : %s\n", fontEdgeColor);
+                        uint32_t fontOpacity = Accessibility_ClosedCaptionsStyles_Get_FontOpacity(styleHandle);
+                        printf("\tFontOpacity : %d\n", fontOpacity);
+                        char* bgColor = Accessibility_ClosedCaptionsStyles_Get_BackgroundColor(styleHandle);
+                        printf("\tBackgroundColor : %s\n", bgColor);
+                        uint32_t bgOpacity = Accessibility_ClosedCaptionsStyles_Get_BackgroundOpacity(styleHandle);
+                        printf("\tBackgroundOpacity : %d\n", bgOpacity);
+                        char* txAlign = Accessibility_ClosedCaptionsStyles_Get_TextAlign(styleHandle);
+                        printf("\tTextAlign : %s\n", txAlign);
+                        char* txAlignVertical = Accessibility_ClosedCaptionsStyles_Get_TextAlignVertical(styleHandle);
+                        printf("\tTextAlignVertical : %s\n", txAlignVertical);
+                        Accessibility_ClosedCaptionsStylesHandle_Release(styleHandle);
+                    }
+                    bool enabled = Accessibility_ClosedCaptionsSettings_Get_Enabled(handle);
+                    printf("Enabled: %d\n\n", enabled);
+                    Accessibility_ClosedCaptionsSettingsHandle_Release(handle);
+                } else {
+                    printf("Invalid ClosedCaptionsSettingsHandle\n\n");
+                }
+            } else {
+                printf("Failed to get Closed Caption Settings\n\n");
+            }
+            break;
+        }
+        case 'G': {
+            Accessibility_VoiceGuidanceSettingsHandle handle;
+            uint32_t result = Accessibility_GetVoiceGuidanceSettings(&handle);
+
+            if (result == FireboltSDKErrorNone) {
+                if (Accessibility_VoiceGuidanceSettingsHandle_IsValid(handle) == true) {
+                    bool enabled = Accessibility_VoiceGuidanceSettings_Get_Enabled(handle);
+                    uint32_t speed = Accessibility_VoiceGuidanceSettings_Get_Speed(handle);
+                    printf("VoiceGuidanceSettings: Enabled : %d, Speed : %d\n", enabled, speed);
+                    Accessibility_VoiceGuidanceSettingsHandle_Release(handle);
+                } else {
+                    printf("Invalid VoiceGuidanceSettingsHandle\n\n");
+                }
+            } else {
+                printf("Failed to get Voice Guidance Settings\n\n");
+            }
+            break;
+        }
+        case 'P': {
+            Advertising_AdPolicyHandle handle;
+            uint32_t result = Advertising_GetPolicy(&handle);
+            if (result == FireboltSDKErrorNone) {
+                if (Advertising_AdPolicyHandle_IsValid(handle) == true) {
+                    printf("AdPolicy: ");
+                    Advertising_SkipRestriction skipRestriction = Advertising_AdPolicy_Get_SkipRestriction(handle);
+                    printf("SkipRestriction = %s ", get_skiprestriction_enum_string(skipRestriction));
+                    bool limitAdTracking = Advertising_AdPolicy_Get_LimitAdTracking(handle);
+                    printf("LimitAdTracking = %s \n", limitAdTracking? "true" : "false");
+                    Advertising_AdPolicyHandle_Release(handle);
+                } else {
+                    printf("Invalid Advertising_AdPolicyHandle\n\n");
+                }
+            } else {
+                printf("Failed to get Advertising Policy\n\n");
+            }
+            break;
+        }
+        case 'U': {
+            FireboltTypes_StringHandle handle;
+            uint32_t result = Account_GetUid(&handle);
+            if (result == FireboltSDKErrorNone) {
+                if (Advertising_AdPolicyHandle_IsValid(handle) == true) {
+                    printf("Account: Uid:%s\n\n", FireboltTypes_String(handle));
+                    FireboltTypes_StringHandle_Release(handle);
+                    handle = NULL;
+                }
+            } else {
+                printf("Failed to get Advertising Policy\n\n");
+            }
+            break;
+        }
+        case 'R': {
+            HandleEventListener(Device, ScreenResolution, (const void*)NotifyDeviceScreenResolutionChange, deviceScreenResolutionTestStr, "device.screenresolution")
+            break;
+        }
+        case 'N': {
+            HandleEventListener(Device, Name, (const void*)NotifyDeviceNameChange, deviceNameTestStr, "device.name")
+            break;
+        }
+        case 'A': {
+            HandleEventListener(Accessibility, VoiceGuidanceSettings, (const void*)NotifyAccessibilityVoiceGuidanceChange, accessibilityVoiceGuidanceTestStr, "accessibility.voiceguidance")
+            break;
+        }
+        default:
+            break;
+        }
+        getchar(); // Skip white space
+    } while (option != 'Q');
 
     FireboltSDK_Deinitialize();
 
