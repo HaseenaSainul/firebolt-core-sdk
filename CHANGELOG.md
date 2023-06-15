@@ -55,6 +55,7 @@
 
 # [0.13.0-next.2](https://github.com/rdkcentral/firebolt-apis/compare/v0.13.0-next.1...v0.13.0-next.2) (2023-06-09)
 
+
 ### Bug Fixes
 
 * SDK Release Notes ([cf1089f](https://github.com/rdkcentral/firebolt-apis/commit/cf1089f77fbccdf998d4bc810528b7056932f0bb))
